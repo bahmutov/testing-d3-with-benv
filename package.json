@@ -16,7 +16,10 @@
     "jshint-stylish": "^0.1.5",
     "matchdep": "^0.3.0",
     "mocha": "^1.18.2",
-    "should": "^3.2.0-beta1"
+    "should": "^3.2.0-beta1",
+    "q": "^1.0.1",
+    "gt": "^0.8.34",
+    "lodash": "^2.4.1"
   },
   "homepage": "https://github.com/bahmutov/testing-d3-with-benv",
   "keywords": [
@@ -33,6 +36,6 @@
     "url": "git://github.com/bahmutov/testing-d3-with-benv.git"
   },
   "scripts": {
-    "test": "node node_modules/mocha/bin/mocha app-test.js -R spec"
+    "test": "node node_modules/gt/gt.js d3-gt-test.js -o"
   }
 }
