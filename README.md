@@ -16,6 +16,7 @@ The repository shows different aspects of testing using different branches
 To try these yourself (d3 tests for example):
 
     git clone https://github.com/bahmutov/testing-d3-with-benv.git
+    cd testing-d3-with-benv
     git checkout d3-testing // or dom-testing
     npm install
     grunt
