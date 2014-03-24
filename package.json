@@ -13,13 +13,13 @@
     "grunt-contrib-jshint": "^0.9.2",
     "grunt-nice-package": "^0.2.3",
     "grunt-npm2bower-sync": "^0.3.0",
+    "gt": "^0.8.34",
     "jshint-stylish": "^0.1.5",
+    "lodash": "^2.4.1",
     "matchdep": "^0.3.0",
     "mocha": "^1.18.2",
-    "should": "^3.2.0-beta1",
     "q": "^1.0.1",
-    "gt": "^0.8.34",
-    "lodash": "^2.4.1"
+    "should": "^3.2.0-beta1"
   },
   "homepage": "https://github.com/bahmutov/testing-d3-with-benv",
   "keywords": [

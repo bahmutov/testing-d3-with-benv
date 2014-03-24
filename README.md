@@ -1,105 +1,236 @@
 # testing-d3-with-benv
 
-Simple JavaScript DOM manipulation testing from command line
-without an actual browser.
+Simple D3 testing from command line without an actual browser.
 
 install:
 
     npm install
     grunt
 
-## Step 1 - testing without a browser
+For basics of DOM testing without a browser using synthetic environment,
+see [Step 1 - dom-testing branch](https://github.com/bahmutov/testing-d3-with-benv/tree/dom-testing)
 
-Unit testing DOM manipulation code does not require a browser,
-even a headless one like Phantomjs. The synthetic DOM as
-exposed by [jsdom](https://github.com/tmpvar/jsdom) and wrapped by
-[benv](https://github.com/artsy/benv) is good enough for most basic
-HTML manipulation. Here is an example for testing jQuery modification
-of an HTML document in [index.html](index.html)
+## Step 2 - testing D3 example
+
+### drawing setup
+
+Lets write a small D3 function that creates a bar chart
+given an array of numbers. The HTML document is really simple [index.html](index.hml)
 
 ```html
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
-  <meta charset="utf-8">
-  <title>cli testing using benv</title>
-  <script src="bower_components/jquery/dist/jquery.js"></script>
-  <script src="app.js"></script>
+<meta charset="utf-8">
+<title>d3 testing using benv</title>
+<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="bower_components/d3/d3.js"></script>
+<script src="d3-drawing.js"></script>
+<style>
+div.bar {
+    display: inline-block;
+    width: 20px;
+    height: 75px;
+    background-color: teal;
+    margin-right: 2px;
+}
+</style>
+... drawing will be here
 </head>
 <body>
-  <h1>app example</h1>
+    <h1>D3 example</h1>
 </body>
 </html>
 ```
 
-The document starts with single H1 tag and loads jQuery and [app.js](app.js)
-that creates a function `window.append` to append an H2 tag to the body.
+The drawing code in [d3-drawing.js](d3-drawing.js) executes on document ready event
 
 ```js
-/* global window */
-if (typeof $ === 'undefined') {
-  throw new Error('missing $');
-}
-window.append = function () {
-  'use strict';
-  $('body').append('<h2>added</h2>');
+window.drawBars = function (el, dataset) {
+  if (!Array.isArray(dataset) || !dataset.length) {
+    throw new Error('Need non empty array to plot');
+  }
+  window.d3.select(el)
+    .selectAll('div')
+    .data(dataset)
+    .enter()
+    .append('div')
+    .attr('class', 'bar')
+    .style('height', function (d) {
+      var barHeight = d * 5;
+      return barHeight + 'px';
+    });
 };
 ```
 
-I wrote simple unit tests that run from [node](http://nodejs.org/) command line
-and test the DOM updates using [mocha](https://www.npmjs.org/package/mocha) BDD
-framework. Before each test, we initialize the new DOM using *benv* module. For
-the entire suite of tests, see [app-test.js](app-test.js)
+The `window.drawBars` is used from `index.html` to draw on document ready event
+
+```html
+<script>
+$(function drawOnStart() {
+  'use strict';
+
+  var dataset = [];
+  for (var i = 0; i < 20; i++) {
+    var newNumber = Math.random() * 25;
+    dataset = dataset.concat(Math.round(newNumber));
+  }
+  window.drawBars('body', dataset);
+});
+</script>
+```
+
+The result is something like this
+
+![random bars drawn](d3-testing.png)
+
+### testing
+
+Let's write tests to verify that
+
+1. Drawing function `drawBars` raises an exception without data argument.
+2. The drawing does create the correct number of bar DIV nodes
+
+I picked [gt](https://github.com/bahmutov/gt) because I wrote it, it has
+good support for async testing, and it has built-in code coverage by default.
+The tests will use [QUnit](http://qunitjs.com/) TDD syntax. Before each test
+we will initialize the DOM environment using benv, which requires an async
+code execution. gt supports async functions that return a promise object.
+
+### test environment
 
 ```js
+var Q = require('q');
 var benv = require('benv');
-var should = require('should');
-describe('app.js', function () {
-  beforeEach(function (done) {
+QUnit.module('d3-drawing.js', {
+  setupOnce: function () {
+    console.log('please wait a couple of seconds, instrumenting D3 and jQuery takes time');
+  },
+  setup: function () {
+    var defer = Q.defer();
     benv.setup(function () {
       benv.expose({
         $: require('./bower_components/jquery/dist/jquery.js')
       });
-      done();
+      window.d3 = require('./bower_components/d3/d3.js');
+      defer.resolve();
     });
-  });
-  afterEach(function () {
+    return defer.promise;
+  },
+  teardown: function () {
     benv.teardown();
-  });
-  it('updates DOM on demand', function () {
-    // load into the "browser" window with cache bust
-    benv.require('./app.js');
-    $('body').html().should.not.include('app example');
-    window.append.should.be.a.Function;
-    window.append();
-    $('body').html().should.include('added');
+  }
+});
+```
+
+Note that both jQuery and D3 are loaded differently. jQuery attaches itself to global object
+as $ symbol and is available everywhere, including the unit tests. We are attaching D3 object
+to the `window` object explicitly to make sure this is consistent with what a browser would do.
+Since we are going to execute the D3 drawing code from node environment we need to thus
+use `window.d3` and not just `d3`. A good pattern is to create an IIFE just for this purpose
+
+```js
+(function (d3) {
+  window.drawBars = function (el, dataset) {
+    if (!Array.isArray(dataset) || !dataset.length) {
+      throw new Error('Need non empty array to plot');
+    }
+    d3.select(el)
+      .selectAll('div')
+      .data(dataset)
+      .enter()
+      .append('div')
+      .attr('class', 'bar')
+      .attr('width', '20')
+      .style('height', function (d) {
+        var barHeight = d * 5;
+        return barHeight + 'px';
+      });
+  };
+}(window.d3));
+```
+
+### unit tests
+
+We can check if the environment has been initialized correctly
+
+```js
+QUnit.test('window', function () {
+  QUnit.equal(typeof window, 'object', 'window exists');
+});
+
+QUnit.test('jQuery $', function () {
+  QUnit.equal(typeof $, 'function', '$ exists');
+});
+
+QUnit.test('window.d3', function () {
+  QUnit.equal(typeof window.d3, 'object', 'window.d3 exists');
+});
+```
+
+We can also check if the D3 code is working:
+
+```js
+QUnit.async('draws 20 bars', function () {
+  // load d3-drawing.js and avoid caching by the node runtime
+  benv.require('./d3-drawing.js');
+  QUnit.equal(typeof window.drawBars, 'function', 'drawBars function registered');
+  window.drawBars('body', [5, 10]);
+
+  // allows D3 code to run
+  _.defer(function () {
+    QUnit.equal($('div.bar').length, 2, 'D3 created correct number of div bars');
+    QUnit.start();
   });
 });
 ```
 
-You can run unit tests using `npm test` command. Should show something
+Two notes about this unit test.
+
+1. I am using `benv.require` call to load the drawing code
+2. We need to defer the assertions using `_.defer` or `setTimeout` call to let
+D3 code to run and actually create the right DOM structures.
+
+### running unit tests
+
+You can run unit tests using `npm test` command. It should show something
 similar to this:
 
 ```
 $ npm test
 
 > testing-d3-with-benv@0.0.0 test /Users/gleb/git/testing-d3-with-benv
-> node node_modules/mocha/bin/mocha app-test.js -R spec
+> node node_modules/gt/gt.js d3-gt-test.js -o
 
-  without benv setup
-    ✓ fails to find jQuery
-
-  app.js
-    ✓ has window object
-    ✓ has nothing to do with index.html
-    ✓ registers append function
-    ✓ adds to body
-    ✓ can replace html with index.html from disk
-    ✓ does not run scripts when loading index.html from disk
-
-
-  7 passing (134ms)
+please wait a couple of seconds, instrumenting D3 and jQuery takes time
+15:52:03 - info:    starting test "draws 20 bars"
+========================== /Users/gleb/git/testing-d3-with-benv/d3-gt-test.js ===========================
+d3-drawing.js 39ms
+  draws 20 bars                                                               100% (1 / 1) : PASS
+    /Users/gleb/git/testing-d3-with-benv/d3-gt-test.js                          100% (1 / 1)
+=========================================================================================================
+100% (1 / 1) tests passed
+------------------------------------------------------+-----------+-----------+-----------+-----------+
+File                                                  |   % Stmts |% Branches |   % Funcs |   % Lines |
+------------------------------------------------------+-----------+-----------+-----------+-----------+
+   testing-d3-with-benv/                              |     93.33 |     66.67 |       100 |     93.33 |
+      d3-drawing.js                                   |     85.71 |     66.67 |       100 |     85.71 |
+      d3-gt-test.js                                   |       100 |       100 |       100 |       100 |
+   testing-d3-with-benv/bower_components/d3/          |     16.77 |      2.25 |       4.8 |     18.54 |
+      d3.js                                           |     16.77 |      2.25 |       4.8 |     18.54 |
+   testing-d3-with-benv/bower_components/jquery/dist/ |     22.72 |     10.82 |     19.25 |     22.72 |
+      jquery.js                                       |     22.72 |     10.82 |     19.25 |     22.72 |
+------------------------------------------------------+-----------+-----------+-----------+-----------+
+All files                                             |     18.85 |       6.6 |      9.13 |     20.18 |
+------------------------------------------------------+-----------+-----------+-----------+-----------+
 ```
+
+You can see that the unit test has passed, and the test runner computed coverage information for all
+loaded files. You can open `cover/lcov-report/index.htm` in a browser to see line by line
+coverage information. For example for `d3-drawing.js` it shows the correct number of times each line
+has been called while creating 20 bars
+
+![d3-testing coverage](d3-testing-coverage.png)
 
 ## Small print
 

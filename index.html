@@ -15,6 +15,18 @@ div.bar {
     margin-right: 2px;
 }
 </style>
+<script>
+$(function drawOnStart() {
+  'use strict';
+
+  var dataset = [];
+  for (var i = 0; i < 20; i++) {
+    var newNumber = Math.random() * 25;
+    dataset = dataset.concat(Math.round(newNumber));
+  }
+  window.drawBars('body', dataset);
+});
+</script>
 </head>
 <body>
     <h1>D3 example</h1>
