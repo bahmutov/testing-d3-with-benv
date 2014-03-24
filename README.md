@@ -43,7 +43,7 @@ div.bar {
 </html>
 ```
 
-The drawing code in [d3-drawing.js](d3-drawing.js) executes on document ready event
+The drawing code in [d3-drawing.js](d3-drawing.js) registers a function `drawBars`
 
 ```js
 window.drawBars = function (el, dataset) {
@@ -91,11 +91,11 @@ Let's write tests to verify that
 1. Drawing function `drawBars` raises an exception without data argument.
 2. The drawing does create the correct number of bar DIV nodes
 
-I picked [gt](https://github.com/bahmutov/gt) because I wrote it, it has
-good support for async testing, and it has built-in code coverage by default.
+I picked [gt](https://github.com/bahmutov/gt) because it has
+good async test support and built-in code coverage by default.
 The tests will use [QUnit](http://qunitjs.com/) TDD syntax. Before each test
 we will initialize the DOM environment using benv, which requires an async
-code execution. gt supports async functions that return a promise object.
+code execution. GT supports async module setup functions that return promises.
 
 ### test environment
 
@@ -123,10 +123,10 @@ QUnit.module('d3-drawing.js', {
 });
 ```
 
-Note that both jQuery and D3 are loaded differently. jQuery attaches itself to global object
+Note that jQuery and D3 are loaded differently. jQuery attaches itself to global object
 as $ symbol and is available everywhere, including the unit tests. We are attaching D3 object
 to the `window` object explicitly to make sure this is consistent with what a browser would do.
-Since we are going to execute the D3 drawing code from node environment we need to thus
+Since we are going to execute the D3 drawing code from node environment we need to
 use `window.d3` and not just `d3`. A good pattern is to create an IIFE just for this purpose
 
 ```js
@@ -180,6 +180,7 @@ QUnit.async('draws 20 bars', function () {
   // allows D3 code to run
   _.defer(function () {
     QUnit.equal($('div.bar').length, 2, 'D3 created correct number of div bars');
+    // more assertions that inspect individual bars
     QUnit.start();
   });
 });
