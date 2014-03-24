@@ -97,6 +97,8 @@ The tests will use [QUnit](http://qunitjs.com/) TDD syntax. Before each test
 we will initialize the DOM environment using benv, which requires an async
 code execution. GT supports async module setup functions that return promises.
 
+You can run unit tests using command `npm test`
+
 ### test environment
 
 ```js
@@ -192,10 +194,36 @@ Two notes about this unit test.
 2. We need to defer the assertions using `_.defer` or `setTimeout` call to let
 D3 code to run and actually create the right DOM structures.
 
+D3 is nothing but DOM manipulator, so any time you would like to see the current
+document structure, just log the body of the document
+
+```js
+// inside unit test
+window.drawBars('body', [5, 10]);
+// sometime later
+console.log($('body').html());
+```
+
+### Checking exceptions
+
+Let's test how the `window.drawBars` throws an exception if called without data
+
+```js
+QUnit.test('trying to call without data', function () {
+  QUnit.raises(function () {
+    benv.require('./d3-drawing.js');
+    window.drawBars('body');
+  }, 'Error', 'Raises error without data');
+});
+```
+
+Notice that this test is synchronous because the exception is raised
+right away.
+
 ### running unit tests
 
-You can run unit tests using `npm test` command. It should show something
-similar to this:
+You can run unit tests using `npm test` command.
+It should show something similar to this:
 
 ```
 $ npm test
