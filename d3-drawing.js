@@ -3,7 +3,7 @@ if (typeof window.d3 === 'undefined') {
   throw new Error('missing d3');
 }
 
-window.drawBars = function (el, dataset) {
+window.drawBars = function (el, dataset, tooltipFn) {
   if (!Array.isArray(dataset) || !dataset.length) {
     throw new Error('Need non empty array to plot');
   }
@@ -14,6 +14,9 @@ window.drawBars = function (el, dataset) {
     .append('div')
     .attr('class', 'bar')
     .attr('width', '20')
+    .attr('title', tooltipFn || function (d, k) {
+      return k + ': ' + d;
+    })
     .style('height', function (d) {
       var barHeight = d * 5;
       return barHeight + 'px';
