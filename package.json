@@ -1,0 +1,33 @@
+{
+  "name": "testing-d3-with-benv",
+  "description": "Unit testing D3 with benv and gt",
+  "version": "0.0.0",
+  "author": "Gleb Bahmutov <gleb.bahmutov@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/bahmutov/testing-d3-with-benv/issues"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.4",
+    "grunt-contrib-jshint": "^0.9.2",
+    "grunt-nice-package": "^0.2.3",
+    "jshint-stylish": "^0.1.5",
+    "matchdep": "^0.3.0"
+  },
+  "homepage": "https://github.com/bahmutov/testing-d3-with-benv",
+  "keywords": [
+    "d3",
+    "testing",
+    "benv",
+    "example",
+    "gt"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bahmutov/testing-d3-with-benv.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
