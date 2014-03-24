@@ -3,10 +3,20 @@ if (typeof window.d3 === 'undefined') {
   throw new Error('missing d3');
 }
 
+if (typeof window.drawBars === 'function') {
+  throw new Error('drawBars has been registered already');
+}
+
 window.drawBars = function (el, dataset, tooltipFn) {
   if (!Array.isArray(dataset) || !dataset.length) {
     throw new Error('Need non empty array to plot');
   }
+  function defaultTooltipFn(d, k) {
+    return k + ': ' + d;
+  }
+  var tp = tooltipFn || defaultTooltipFn;
+  console.log('tooltip fn =', tp.name);
+
   window.d3.select(el)
     .selectAll('div')
     .data(dataset)
@@ -14,11 +24,10 @@ window.drawBars = function (el, dataset, tooltipFn) {
     .append('div')
     .attr('class', 'bar')
     .attr('width', '20')
-    .attr('title', tooltipFn || function (d, k) {
-      return k + ': ' + d;
-    })
+    .attr('title', tp)
     .style('height', function (d) {
       var barHeight = d * 5;
       return barHeight + 'px';
     });
+  console.log('registered drawBars');
 };

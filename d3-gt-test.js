@@ -23,45 +23,40 @@ QUnit.module('d3-drawing.js', {
   }
 });
 
-QUnit.test('window', function () {
-  QUnit.equal(typeof window, 'object', 'window exists');
-});
-
-QUnit.test('jQuery $', function () {
-  QUnit.equal(typeof $, 'function', '$ exists');
-});
-
-QUnit.test('window.d3', function () {
-  QUnit.equal(typeof window.d3, 'object', 'window.d3 exists');
-});
-
-QUnit.test('window.drawBars', function () {
-  // load d3-drawing.js and avoid caching by the node runtime
+QUnit.async('tooltip function', function () {
   benv.require('./d3-drawing.js');
-  QUnit.equal(typeof window.drawBars, 'function', 'drawBars function registered');
-});
 
-QUnit.async('draws 20 bars', function () {
-  benv.require('./d3-drawing.js');
-  window.drawBars('body', [5, 10]);
+  var data = [5, 10];
+  var tooltipCount = 0;
+  function tooltipFn(d, k) {
+    tooltipCount += 1;
+    console.assert(typeof k === 'number', '1: k is not a number ' + k);
+    console.assert(d === data[k], '1: invalid data to tooltip function ' + k);
+    return String(d);
+  }
 
-  // allows D3 logic to run
+  window.drawBars('body', data, tooltipFn);
   _.defer(function () {
-    QUnit.equal($('div.bar').length, 2, 'D3 created 2 div bars');
-    // console.log($('body').html());
-    var bar1 = $('div.bar')[0];
-    var bar2 = $('div.bar')[1];
-    var w1 = +$(bar1).attr('width');
-    var w2 = +$(bar2).attr('width');
-    QUnit.ok(w1 > 0, 'bars have positive width', w1);
-    QUnit.equal(w1, w2, 'bars have equal width', w1, w2);
+    QUnit.equal(tooltipCount, data.length, 'tooltip function called correct number of times');
     QUnit.start();
   });
 });
 
-QUnit.test('trying to call without data', function () {
-  QUnit.raises(function () {
-    benv.require('./d3-drawing.js');
-    window.drawBars('body');
-  }, 'Error', 'Raises error without data');
+QUnit.async('tooltip2 function', function () {
+  benv.require('./d3-drawing.js');
+
+  var data = [5, 10];
+  var tooltipCount = 0;
+  function tooltipFn2(d, k) {
+    tooltipCount += 1;
+    console.assert(typeof k === 'number', '2: k is not a number ' + k);
+    console.assert(d === data[k], '2: invalid data to tooltip function ' + k);
+    return String(d);
+  }
+
+  window.drawBars('body', data, tooltipFn2);
+  _.defer(function () {
+    QUnit.equal(tooltipCount, data.length, 'tooltip function called correct number of times');
+    QUnit.start();
+  });
 });
