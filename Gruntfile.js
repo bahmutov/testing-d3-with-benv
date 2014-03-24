@@ -9,12 +9,33 @@ module.exports = function (grunt) {
       ],
       options: {
         jshintrc: '.jshintrc',
-        reporter: require('jshint-stylish')
+        force: true
       }
     },
 
     'nice-package': {
       all: {}
+    },
+
+    sync: {
+      all: {
+        options: {
+          sync: ['author', 'name', 'version', 'private', 'license', 'keywords'],
+        }
+      }
+    },
+
+    bower: {
+      install: {
+        options: {
+          targetDir: 'bower_components',
+          copy: false,
+          verbose: true,
+          bowerOptions: {
+            forceLatest: true
+          }
+        }
+      }
     }
   });
 
@@ -22,5 +43,5 @@ module.exports = function (grunt) {
   var plugins = require('matchdep').filterDev('grunt-*');
   plugins.forEach(grunt.loadNpmTasks);
 
-  grunt.registerTask('default', ['jshint', 'nice-package']);
+  grunt.registerTask('default', ['sync', 'bower', 'jshint', 'nice-package']);
 };
