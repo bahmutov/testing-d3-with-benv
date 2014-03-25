@@ -23,6 +23,8 @@ To try these yourself (d3 tests for example):
     grunt
     npm test
 
+Available branches: dom-testing, d3-testing, d3-function-testing
+
 ## Small print
 
 Author: Gleb Bahmutov &copy; 2014
