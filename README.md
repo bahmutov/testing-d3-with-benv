@@ -8,11 +8,14 @@ D3 drawing code without using a browser, with just Nodejs synthetic
 browser environment. The tests are fast, provide code coverage information
 and could be run continuously.
 
-The repository shows different aspects of testing using different branches
+The repository shows different aspects of testing using different branches:
 
-* [DOM testing](https://github.com/bahmutov/testing-d3-with-benv/tree/dom-testing)
-* [D3 testing](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-testing)
-* [D3 function testing](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-function-testing)
+* branch dom-testing - [DOM testing](https://github.com/bahmutov/testing-d3-with-benv/tree/dom-testing)
+* branch d3-testing - [D3 testing](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-testing)
+* branch d3-function-testing - [D3 function testing](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-function-testing)
+* d3-mouseover-testing - [D3 events testing](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-mouseover-testing)
+
+Each branch has its own code and detailed README
 
 To try these yourself (d3 tests for example):
 
@@ -22,8 +25,6 @@ To try these yourself (d3 tests for example):
     npm install
     grunt
     npm test
-
-Available branches: dom-testing, d3-testing, d3-function-testing
 
 ## Small print
 
