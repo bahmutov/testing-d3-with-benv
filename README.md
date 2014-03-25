@@ -12,6 +12,7 @@ The repository shows different aspects of testing using different branches
 
 * [DOM testing](https://github.com/bahmutov/testing-d3-with-benv/tree/dom-testing)
 * [D3 testing](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-testing)
+* [D3 function testing](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-function-testing)
 
 To try these yourself (d3 tests for example):
 
