@@ -7,12 +7,9 @@ if (typeof window.drawBars === 'function') {
   throw new Error('drawBars has been registered already');
 }
 
-window.drawBars = function (el, dataset, tooltipFn) {
+window.drawBars = function (el, dataset, onMouseOver, onMouseOut) {
   if (!Array.isArray(dataset) || !dataset.length) {
     throw new Error('Need non empty array to plot');
-  }
-  function defaultTooltipFn(d, k) {
-    return k + ': ' + d;
   }
   window.d3.select(el)
     .selectAll('div')
@@ -21,9 +18,10 @@ window.drawBars = function (el, dataset, tooltipFn) {
     .append('div')
     .attr('class', 'bar')
     .attr('width', '20')
-    .attr('title', tooltipFn || defaultTooltipFn)
     .style('height', function (d) {
       var barHeight = d * 5;
       return barHeight + 'px';
-    });
+    })
+    .on('mouseover', onMouseOver)
+    .on('mouseout', onMouseOut);
 };

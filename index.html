@@ -24,7 +24,13 @@ $(function drawOnStart() {
     var newNumber = Math.random() * 25;
     dataset = dataset.concat(Math.round(newNumber));
   }
-  window.drawBars('body', dataset);
+  function onMouseOver() {
+    d3.select(this).style('background-color', 'red');
+  }
+  function onMouseOut() {
+    d3.select(this).style('background-color', 'teal');
+  }
+  window.drawBars('body', dataset, onMouseOver, onMouseOut);
 });
 </script>
 </head>

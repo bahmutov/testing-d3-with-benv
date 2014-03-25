@@ -23,40 +23,18 @@ QUnit.module('d3-drawing.js', {
   }
 });
 
-QUnit.async('tooltip function', function () {
+QUnit.async('on mouseover calls function', function () {
   benv.require('./d3-drawing.js');
+
+  var called = false;
+  function onMouseOver() {
+    called = true;
+  }
 
   var data = [5, 10];
-  var tooltipCount = 0;
-  function tooltipFn(d, k) {
-    tooltipCount += 1;
-    console.assert(typeof k === 'number', '1: k is not a number ' + k);
-    console.assert(d === data[k], '1: invalid data to tooltip function ' + k);
-    return String(d);
-  }
-
-  window.drawBars('body', data, tooltipFn);
+  window.drawBars('body', data, onMouseOver);
   _.defer(function () {
-    QUnit.equal(tooltipCount, data.length, 'tooltip function called correct number of times');
-    QUnit.start();
-  });
-});
-
-QUnit.async('tooltip function with 3 bars', function () {
-  benv.require('./d3-drawing.js');
-
-  var data = [5, 10, 11];
-  var tooltipCount = 0;
-  function tooltipFn2(d, k) {
-    tooltipCount += 1;
-    console.assert(typeof k === 'number', 'k is not a number ' + k);
-    console.assert(d === data[k], 'invalid data to tooltip function ' + k);
-    return String(d);
-  }
-
-  window.drawBars('body', data, tooltipFn2);
-  _.defer(function () {
-    QUnit.equal(tooltipCount, data.length, 'tooltip function called correct number of times');
+    QUnit.ok(called, 'mouse over function has been called');
     QUnit.start();
   });
 });
