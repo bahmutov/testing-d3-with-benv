@@ -23,18 +23,42 @@ QUnit.module('d3-drawing.js', {
   }
 });
 
+QUnit.test('background color', function () {
+  benv.require('./d3-drawing.js');
+  var data = [5, 10];
+  window.drawBars('body', data);
+
+  var firstBar = $('div.bar')[0];
+  var color = $(firstBar).css('background-color');
+  QUnit.equal(color, 'teal', 'correct background color');
+});
+
 QUnit.async('on mouseover calls function', function () {
   benv.require('./d3-drawing.js');
 
   var called = false;
   function onMouseOver() {
     called = true;
+    window.d3.select(this).style('background-color', 'red');
   }
 
   var data = [5, 10];
   window.drawBars('body', data, onMouseOver);
+
+  var evt = window.document.createEvent('MouseEvents');
+  QUnit.ok(evt, 'created mouse event');
+
+  // https://developer.mozilla.org/en-US/docs/Web/API/event.initMouseEvent
+  evt.initMouseEvent('mouseover', true, true, window,
+    0, 0, 0, 5, 5,
+    false, false, false, false, 0, null);
+
+  $('div.bar')[0].dispatchEvent(evt);
+
   _.defer(function () {
     QUnit.ok(called, 'mouse over function has been called');
+    var color = $($('div.bar')[0]).css('background-color');
+    QUnit.equal(color, 'red', 'background color has been changed');
     QUnit.start();
   });
 });

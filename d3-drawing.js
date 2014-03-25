@@ -18,6 +18,7 @@ window.drawBars = function (el, dataset, onMouseOver, onMouseOut) {
     .append('div')
     .attr('class', 'bar')
     .attr('width', '20')
+    .style('background-color', 'teal')
     .style('height', function (d) {
       var barHeight = d * 5;
       return barHeight + 'px';
