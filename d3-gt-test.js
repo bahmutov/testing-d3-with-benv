@@ -11,9 +11,9 @@ QUnit.module('d3-drawing.js', {
     var defer = Q.defer();
     benv.setup(function () {
       benv.expose({
-        $: require('./bower_components/jquery/dist/jquery.js')
+        $: benv.require('./bower_components/jquery/dist/jquery.js')
       });
-      window.d3 = require('./bower_components/d3/d3.js');
+      window.d3 = benv.require('./bower_components/d3/d3.js');
       defer.resolve();
     });
     return defer.promise;
@@ -42,15 +42,15 @@ QUnit.async('tooltip function', function () {
   });
 });
 
-QUnit.async('tooltip2 function', function () {
+QUnit.async('tooltip function with 3 bars', function () {
   benv.require('./d3-drawing.js');
 
-  var data = [5, 10];
+  var data = [5, 10, 11];
   var tooltipCount = 0;
   function tooltipFn2(d, k) {
     tooltipCount += 1;
-    console.assert(typeof k === 'number', '2: k is not a number ' + k);
-    console.assert(d === data[k], '2: invalid data to tooltip function ' + k);
+    console.assert(typeof k === 'number', 'k is not a number ' + k);
+    console.assert(d === data[k], 'invalid data to tooltip function ' + k);
     return String(d);
   }
 

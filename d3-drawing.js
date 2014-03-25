@@ -14,9 +14,6 @@ window.drawBars = function (el, dataset, tooltipFn) {
   function defaultTooltipFn(d, k) {
     return k + ': ' + d;
   }
-  var tp = tooltipFn || defaultTooltipFn;
-  console.log('tooltip fn =', tp.name);
-
   window.d3.select(el)
     .selectAll('div')
     .data(dataset)
@@ -24,10 +21,9 @@ window.drawBars = function (el, dataset, tooltipFn) {
     .append('div')
     .attr('class', 'bar')
     .attr('width', '20')
-    .attr('title', tp)
+    .attr('title', tooltipFn || defaultTooltipFn)
     .style('height', function (d) {
       var barHeight = d * 5;
       return barHeight + 'px';
     });
-  console.log('registered drawBars');
 };
