@@ -1,6 +1,6 @@
 # testing-d3-with-benv
 
-Testing D3 functions from command line without an actual browser.
+Testing D3 event functions from command line without an actual browser.
 
 install:
 
@@ -10,63 +10,71 @@ install:
 
 Previous parts:
 
-* [Step 1 - dom-testing branch](https://github.com/bahmutov/testing-d3-with-benv/tree/dom-testing)
-* [Step 2 - d3-testing branch](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-testing)
+* [Step 1 - DOM testing](https://github.com/bahmutov/testing-d3-with-benv/tree/dom-testing)
+* [Step 2 - simple D3 testing](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-testing)
+* [Step 3 - D3 user function testing](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-function-testing)
 
-## Step 3 - testing D3 user functions
+## Step 4 - testing D3 event functions
 
-D3 allows passing user functions for most of the values, for example to
-return tooltip text. For example [d3-drawing.js](d3-drawing.js) uses either
-supplied tooltip text function or default one
+Let's say we are changing element's background color on mouse hover
+using D3 event handlers in [index.html](index.html)
 
 ```js
-window.drawBars = function (el, dataset, tooltipFn) {
-  if (!Array.isArray(dataset) || !dataset.length) {
-    throw new Error('Need non empty array to plot');
+$(function drawOnStart() {
+  'use strict';
+
+  var dataset = [];
+  for (var i = 0; i < 20; i++) {
+    var newNumber = Math.random() * 25;
+    dataset = dataset.concat(Math.round(newNumber));
   }
-  function defaultTooltipFn(d, k) {
-    return k + ': ' + d;
+  function onMouseOver() {
+    d3.select(this).style('background-color', 'red');
   }
-  window.d3.select(el)
-    .selectAll('div')
-    .data(dataset)
-    .enter()
-    .append('div')
-    .attr('class', 'bar')
-    .attr('width', '20')
-    .attr('title', tooltipFn || defaultTooltipFn)
-    .style('height', function (d) {
-      var barHeight = d * 5;
-      return barHeight + 'px';
-    });
-};
+  function onMouseOut() {
+    d3.select(this).style('background-color', 'teal');
+  }
+  window.drawBars('body', dataset, onMouseOver, onMouseOut);
+});
 ```
 
-We can test if D3 calls the function with correct parameters for each data item
-without using real browser. See [d3-gt-test.js](d3-gt-test.js)
+If you open *index.html* in your browser and hover over a bar, it should change
+its color
+
+![hover over bar](d3-testing.png)
+
+How do we send a mouse over event to the element in the unit test
+so that D3 picks it up and triggers our callback function?
+By creating a synthetic event ourselves:
 
 ```js
-QUnit.async('tooltip function', function () {
+QUnit.async('on mouseover calls function', function () {
   benv.require('./d3-drawing.js');
-  var data = [5, 10];
-
-  var tooltipCount = 0;
-  function tooltipFn(d, k) {
-    tooltipCount += 1;
-    console.assert(typeof k === 'number', '1: k is not a number ' + k);
-    console.assert(d === data[k], '1: invalid data to tooltip function ' + k);
-    return String(d);
+  var called = false;
+  function onMouseOver() {
+    called = true;
+    window.d3.select(this).style('background-color', 'red');
   }
-  window.drawBars('body', data, tooltipFn);
+  var data = [5, 10];
+  window.drawBars('body', data, onMouseOver);
+  // create synthetic event, jsdom supports all event types
+  var evt = window.document.createEvent('MouseEvents');
+  evt.initMouseEvent('mouseover', true, true, window,
+    0, 0, 0, 5, 5,
+    false, false, false, false, 0, null);
+  $('div.bar')[0].dispatchEvent(evt);
+  // test the results
   _.defer(function () {
-    QUnit.equal(tooltipCount, data.length, 'tooltip function called correct number of times');
+    QUnit.ok(called, 'mouse over function has been called');
+    var color = $($('div.bar')[0]).css('background-color');
+    QUnit.equal(color, 'red', 'background color has been changed');
     QUnit.start();
   });
 });
 ```
 
-If you need more advanced spying (for example to assert number of calls, arguments, etc),
-you can use [sinon.js](https://github.com/webjars/sinonjs) library.
+For more details on `initMouseEvent` and other event methods in modern
+browsers, see [Mozilla docs](// https://developer.mozilla.org/en-US/docs/Web/API/event.initMouseEvent)
 
 ## Small print
 
