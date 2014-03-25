@@ -39,7 +39,6 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.loadTasks('tasks');
   var plugins = require('matchdep').filterDev('grunt-*');
   plugins.forEach(grunt.loadNpmTasks);
 

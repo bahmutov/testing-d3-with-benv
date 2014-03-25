@@ -17,7 +17,7 @@ describe('app.js', function () {
   beforeEach(function (done) {
     benv.setup(function () {
       benv.expose({
-        $: require('./bower_components/jquery/dist/jquery.js')
+        $: benv.require('./bower_components/jquery/dist/jquery.js')
       });
       done();
     });
