@@ -1,7 +1,6 @@
 /* global window */
 var Q = require('q');
 var benv = require('benv');
-var _ = require('lodash');
 
 QUnit.module('d3-drawing.js', {
   setupOnce: function () {
@@ -41,22 +40,29 @@ QUnit.test('window.drawBars', function () {
   QUnit.equal(typeof window.drawBars, 'function', 'drawBars function registered');
 });
 
-QUnit.async('draws 20 bars', function () {
+QUnit.test('draws bars with same width', function () {
   benv.require('./d3-drawing.js');
   window.drawBars('body', [5, 10]);
 
-  // allows D3 logic to run
-  _.defer(function () {
-    QUnit.equal($('div.bar').length, 2, 'D3 created 2 div bars');
-    // console.log($('body').html());
-    var bar1 = $('div.bar')[0];
-    var bar2 = $('div.bar')[1];
-    var w1 = +$(bar1).attr('width');
-    var w2 = +$(bar2).attr('width');
-    QUnit.ok(w1 > 0, 'bars have positive width', w1);
-    QUnit.equal(w1, w2, 'bars have equal width', w1, w2);
-    QUnit.start();
-  });
+  QUnit.equal($('div.bar').length, 2, 'D3 created 2 div bars');
+  var bar1 = $('div.bar')[0];
+  var bar2 = $('div.bar')[1];
+  var w1 = +$(bar1).attr('width');
+  var w2 = +$(bar2).attr('width');
+  QUnit.ok(w1 > 0, 'bars have positive width', w1);
+  QUnit.equal(w1, w2, 'bars have equal width', w1, w2);
+});
+
+QUnit.test('draws bars with proportional height', function () {
+  benv.require('./d3-drawing.js');
+  window.drawBars('body', [5, 10]);
+
+  var bar1 = $('div.bar')[0];
+  var bar2 = $('div.bar')[1];
+  // parse height from style (includes px suffix)
+  var h1 = parseInt($(bar1).css('height'), 10);
+  var h2 = parseInt($(bar2).css('height'), 10);
+  QUnit.equal(h1 * 2, h2, 'first bar should be half in height');
 });
 
 QUnit.test('trying to call without data', function () {
