@@ -177,26 +177,16 @@ QUnit.test('window.d3', function () {
 We can also check if the D3 code is working:
 
 ```js
-QUnit.async('draws 20 bars', function () {
+QUnit.test('draws 20 bars', function () {
   // load d3-drawing.js and avoid caching by the node runtime
   benv.require('./d3-drawing.js');
   QUnit.equal(typeof window.drawBars, 'function', 'drawBars function registered');
   window.drawBars('body', [5, 10]);
 
-  // allows D3 code to run
-  _.defer(function () {
-    QUnit.equal($('div.bar').length, 2, 'D3 created correct number of div bars');
-    // more assertions that inspect individual bars
-    QUnit.start();
-  });
+  QUnit.equal($('div.bar').length, 2, 'D3 created correct number of div bars');
+  // more assertions that inspect individual bars
 });
 ```
-
-Two notes about this unit test.
-
-1. I am using `benv.require` call to load the drawing code
-2. We need to defer the assertions using `_.defer` or `setTimeout` call to let
-D3 code to run and actually create the right DOM structures.
 
 D3 is nothing but DOM manipulator, so any time you would like to see the current
 document structure, just log the body of the document
@@ -207,6 +197,9 @@ window.drawBars('body', [5, 10]);
 // sometime later
 console.log($('body').html());
 ```
+
+Hint: use [js-beautify](https://github.com/einars/js-beautify) to output nicely
+formatted structure instead of text dump.
 
 ### Checking exceptions
 
