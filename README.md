@@ -74,7 +74,7 @@ QUnit.async('on mouseover calls function', function () {
 ```
 
 For more details on `initMouseEvent` and other event methods in modern
-browsers, see [Mozilla docs](// https://developer.mozilla.org/en-US/docs/Web/API/event.initMouseEvent)
+browsers, see [Mozilla docs](https://developer.mozilla.org/en-US/docs/Web/API/event.initMouseEvent)
 
 ## Small print
 
