@@ -11,9 +11,9 @@ QUnit.module('d3-drawing.js', {
     var defer = Q.defer();
     benv.setup(function () {
       benv.expose({
-        $: require('./bower_components/jquery/dist/jquery.js')
+        $: benv.require('./bower_components/jquery/dist/jquery.js')
       });
-      window.d3 = require('./bower_components/d3/d3.js');
+      window.d3 = benv.require('./bower_components/d3/d3.js');
       defer.resolve();
     });
     return defer.promise;

@@ -112,9 +112,9 @@ QUnit.module('d3-drawing.js', {
     var defer = Q.defer();
     benv.setup(function () {
       benv.expose({
-        $: require('./bower_components/jquery/dist/jquery.js')
+        $: benv.require('./bower_components/jquery/dist/jquery.js')
       });
-      window.d3 = require('./bower_components/d3/d3.js');
+      window.d3 = benv.require('./bower_components/d3/d3.js');
       defer.resolve();
     });
     return defer.promise;
@@ -151,6 +151,10 @@ use `window.d3` and not just `d3`. A good pattern is to create an IIFE just for 
   };
 }(window.d3));
 ```
+
+Node module system caches the loaded modules after evaluation.
+Since we need to load the modules from fresh before
+each unit test, we use `benv.require` call.
 
 ### unit tests
 
