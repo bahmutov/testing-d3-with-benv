@@ -46,7 +46,7 @@ We can test if D3 calls the function with correct parameters for each data item
 without using real browser. See [d3-gt-test.js](d3-gt-test.js)
 
 ```js
-QUnit.async('tooltip function', function () {
+QUnit.test('tooltip function', function () {
   benv.require('./d3-drawing.js');
   var data = [5, 10];
 
@@ -58,10 +58,7 @@ QUnit.async('tooltip function', function () {
     return String(d);
   }
   window.drawBars('body', data, tooltipFn);
-  _.defer(function () {
-    QUnit.equal(tooltipCount, data.length, 'tooltip function called correct number of times');
-    QUnit.start();
-  });
+  QUnit.equal(tooltipCount, data.length, 'tooltip function called correct number of times');
 });
 ```
 

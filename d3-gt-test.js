@@ -1,7 +1,6 @@
 /* global window */
 var Q = require('q');
 var benv = require('benv');
-var _ = require('lodash');
 
 QUnit.module('d3-drawing.js', {
   setupOnce: function () {
@@ -23,7 +22,7 @@ QUnit.module('d3-drawing.js', {
   }
 });
 
-QUnit.async('tooltip function', function () {
+QUnit.test('tooltip function', function () {
   benv.require('./d3-drawing.js');
 
   var data = [5, 10];
@@ -36,13 +35,10 @@ QUnit.async('tooltip function', function () {
   }
 
   window.drawBars('body', data, tooltipFn);
-  _.defer(function () {
-    QUnit.equal(tooltipCount, data.length, 'tooltip function called correct number of times');
-    QUnit.start();
-  });
+  QUnit.equal(tooltipCount, data.length, 'tooltip function called correct number of times');
 });
 
-QUnit.async('tooltip function with 3 bars', function () {
+QUnit.test('tooltip function with 3 bars', function () {
   benv.require('./d3-drawing.js');
 
   var data = [5, 10, 11];
@@ -55,8 +51,5 @@ QUnit.async('tooltip function with 3 bars', function () {
   }
 
   window.drawBars('body', data, tooltipFn2);
-  _.defer(function () {
-    QUnit.equal(tooltipCount, data.length, 'tooltip function called correct number of times');
-    QUnit.start();
-  });
+  QUnit.equal(tooltipCount, data.length, 'tooltip function called correct number of times');
 });
