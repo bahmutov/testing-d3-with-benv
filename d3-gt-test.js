@@ -20,6 +20,13 @@ QUnit.module('d3-drawing.js', {
   }
 });
 
+QUnit.test('try load drawing code twice', function () {
+  QUnit.raises(function () {
+    benv.require('./d3-drawing.js');
+    benv.require('./d3-drawing.js');
+  }, Error, 'cannot load drawing code second time');
+});
+
 QUnit.test('background color', function () {
   benv.require('./d3-drawing.js');
   var data = [5, 10];
