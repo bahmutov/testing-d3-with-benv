@@ -7,6 +7,7 @@ QUnit.module('d3-drawing.js', {
     var defer = Q.defer();
     benv.setup(function () {
       benv.expose({
+        // using jQuery makes selections simple
         $: benv.require('./bower_components/jquery/dist/jquery.js')
       });
       window.d3 = benv.require('./bower_components/d3/d3.js');
@@ -37,11 +38,15 @@ QUnit.test('window.drawBars', function () {
   QUnit.equal(typeof window.drawBars, 'function', 'drawBars function registered');
 });
 
+QUnit.test('draws a bar for each value', function () {
+  benv.require('./d3-drawing.js');
+  window.drawBars('body', [5, 10]);
+  QUnit.equal($('div.bar').length, 2, 'D3 created 2 div bars');
+});
+
 QUnit.test('draws bars with same width', function () {
   benv.require('./d3-drawing.js');
   window.drawBars('body', [5, 10]);
-
-  QUnit.equal($('div.bar').length, 2, 'D3 created 2 div bars');
   var bar1 = $('div.bar')[0];
   var bar2 = $('div.bar')[1];
   var w1 = +$(bar1).attr('width');

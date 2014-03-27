@@ -101,6 +101,10 @@ You can run unit tests using command `npm test`
 
 ### test environment
 
+The environment is setup using an object passed to `QUnit.module` function.
+We will load jQuery and D3 libraries. jQuery is not required, but makes
+CSS selections trivial.
+
 ```js
 var Q = require('q');
 var benv = require('benv');
@@ -174,12 +178,11 @@ QUnit.test('window.d3', function () {
 We can also check if the D3 code is working:
 
 ```js
-QUnit.test('draws 20 bars', function () {
+QUnit.test('draws a bar for each value', function () {
   // load d3-drawing.js and avoid caching by the node runtime
   benv.require('./d3-drawing.js');
   QUnit.equal(typeof window.drawBars, 'function', 'drawBars function registered');
   window.drawBars('body', [5, 10]);
-
   QUnit.equal($('div.bar').length, 2, 'D3 created correct number of div bars');
   // more assertions that inspect individual bars
 });
