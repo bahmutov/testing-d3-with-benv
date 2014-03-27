@@ -15,68 +15,67 @@ Previous parts:
 * [Step 1 - DOM testing](https://github.com/bahmutov/testing-d3-with-benv/tree/dom-testing)
 * [Step 2 - simple D3 testing](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-testing)
 * [Step 3 - D3 user function testing](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-function-testing)
+* [Step 4 - D3 event testing](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-mouseover-testing)
 
-## Step 4 - testing D3 event functions
+## Step 5 - testing D3 code load
 
-Let's say we are changing element's background color on mouse hover
-using D3 event handlers in [index.html](index.html)
+The usual unit testing approach in the browser loads all code synchronously
+before the test runner starts. For example, if the test code is in *tests.js*, it is loaded
+after the D3 drawing code to be tested in *d3-drawing.js* but before the tests are run
+
+```html
+<head>
+  <script src="path/to/jasmine"></script>
+  <script src="d3-drawing.js"></script>
+  <script src="tests.js"></script>
+</head>
+<body>
+  // DOM fixtures
+  <script>
+    (function () {
+      var jasmineEnv = jasmine.getEnv();
+      // more jasmineEnv setup
+      window.onload = function () {
+        jasmineEnv.execute(); // runs unit tests
+      }
+    })();
+  </script>
+</body>
+```
+
+What if our D3 drawing includes initialization we would like to test?
+For example, [d3-drawing.js](d3-drawing.js) includes registering global function that
+throws an exception if we try to load the file twice.
 
 ```js
-$(function drawOnStart() {
-  'use strict';
+if (typeof window.drawBars === 'function') {
+  throw new Error('drawBars has been registered already');
+}
+window.drawBars = function () { ... };
+```
 
-  var dataset = [];
-  for (var i = 0; i < 20; i++) {
-    var newNumber = Math.random() * 25;
-    dataset = dataset.concat(Math.round(newNumber));
-  }
-  function onMouseOver() {
-    d3.select(this).style('background-color', 'red');
-  }
-  function onMouseOut() {
-    d3.select(this).style('background-color', 'teal');
-  }
-  window.drawBars('body', dataset, onMouseOver, onMouseOut);
+We could of course write an async unit test, attach the script tag to the document again, etc.
+But even a try catch around the script loader might not clean up the global DOM / fixture.
+Using synthetic [jsdom](https://github.com/tmpvar/jsdom) makes the problem much simpler
+because each test completely blows away the DOM / document / window!
+Here how we test if trying to load *d3-drawing.js* twice raises an Error.
+
+```
+// d3-gt-test.js
+QUnit.test('try loading drawing code twice', function () {
+  QUnit.raises(function () {
+    benv.require('./d3-drawing.js');
+    benv.require('./d3-drawing.js');
+  }, Error, 'cannot load drawing code second time');
 });
 ```
 
-If you open *index.html* in your browser and hover over a bar, it should change
-its color
+Here is the coverage saved into `cover/lcov-report/index.html` after the test run
 
-![hover over bar](d3-testing.png)
+![testing loading code twice](testing-load-twice.png)
 
-How do we send a mouse over event to the element in the unit test
-so that D3 picks it up and triggers our callback function?
-By creating a synthetic event ourselves:
-
-```js
-QUnit.async('on mouseover calls function', function () {
-  benv.require('./d3-drawing.js');
-  var called = false;
-  function onMouseOver() {
-    called = true;
-    window.d3.select(this).style('background-color', 'red');
-  }
-  var data = [5, 10];
-  window.drawBars('body', data, onMouseOver);
-  // create synthetic event, jsdom supports all event types
-  var evt = window.document.createEvent('MouseEvents');
-  evt.initMouseEvent('mouseover', true, true, window,
-    0, 0, 0, 5, 5,
-    false, false, false, false, 0, null);
-  $('div.bar')[0].dispatchEvent(evt);
-  // test the results
-  _.defer(function () {
-    QUnit.ok(called, 'mouse over function has been called');
-    var color = $($('div.bar')[0]).css('background-color');
-    QUnit.equal(color, 'red', 'background color has been changed');
-    QUnit.start();
-  });
-});
-```
-
-For more details on `initMouseEvent` and other event methods in modern
-browsers, see [Mozilla docs](https://developer.mozilla.org/en-US/docs/Web/API/event.initMouseEvent)
+As you can see line `if (typeof window.drawBars === 'function') {` was executed twice,
+and the error throwing line once.
 
 ## Small print
 
