@@ -58,6 +58,7 @@ QUnit.test('CSV file load', function () {
 
 QUnit.test('CSV file load and sum', function () {
   var states = window.d3.csv.parse(read('data.csv', 'utf8'), type);
+  QUnit.equal(typeof states[0].total, 'number', 'first state has total');
 });
 
 QUnit.test('dispatch load.menu', function () {
