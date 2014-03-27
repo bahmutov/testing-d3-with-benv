@@ -26,6 +26,19 @@ To try these yourself (d3 tests for example):
     grunt
     npm test
 
+## Alternatives
+
+I am showing how to test D3 code using the browser emulation under Node.
+If you would like to use an actual browser, even a headless Phantomjs, see the existing
+literature:
+
+* Chapter "Test Drive your Visualization" in
+[Data Visualization with D3.js Cookbook](http://www.packtpub.com/data-visualization-with-d3-js-cookbook/book)
+by Nick Qi Zhu
+* Chapter "Unit Testing / Test Suites" in
+[Developing a D3.js Edge](http://www.amazon.com/Developing-D3-js-Edge-Roland-Dunn-ebook/dp/B00DNJ1UMM)
+by Chris Viau
+
 ## Small print
 
 Author: Gleb Bahmutov &copy; 2014
