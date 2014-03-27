@@ -253,8 +253,7 @@ All files                                             |     18.85 |       6.6 | 
 
 You can see that the unit test has passed, and the test runner computed coverage information for all
 loaded files. You can open `cover/lcov-report/index.htm` in a browser to see line by line
-coverage information. For example for `d3-drawing.js` it shows the correct number of times each line
-has been called while creating 20 bars
+coverage information.
 
 ![d3-testing coverage](d3-testing-coverage.png)
 
