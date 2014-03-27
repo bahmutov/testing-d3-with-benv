@@ -15,8 +15,15 @@
 <script src="d3-drawing.js"></script>
 <body>
 <script>
-d3.csv("data.csv", type, function(error, states) {
+// Coerce population counts to numbers and compute total per state.
+function type(d) {
+  d.total = d3.sum(groups, function(k) { return d[k] = +d[k]; });
+  return d;
+}
+
+d3.csv('data.csv', type, function(error, states) {
   if (error) throw error;
+  console.log(states);
   var stateById = d3.map();
   states.forEach(function(d) { stateById.set(d.id, d); });
   dispatch.load(stateById);

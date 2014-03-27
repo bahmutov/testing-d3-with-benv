@@ -111,8 +111,3 @@ dispatch.on("load.pie", function(stateById) {
   });
 });
 
-// Coerce population counts to numbers and compute total per state.
-function type(d) {
-  d.total = d3.sum(groups, function(k) { return d[k] = +d[k]; });
-  return d;
-}
