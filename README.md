@@ -84,9 +84,9 @@ The result is something like this
 
 ![random bars drawn](d3-testing.png)
 
-### testing
+## testing
 
-Let's write tests to verify that
+Let's write tests to verify that:
 
 1. Drawing function `drawBars` raises an exception without data argument.
 2. The drawing does create the correct number of bar DIV nodes
@@ -105,9 +105,6 @@ You can run unit tests using command `npm test`
 var Q = require('q');
 var benv = require('benv');
 QUnit.module('d3-drawing.js', {
-  setupOnce: function () {
-    console.log('please wait a couple of seconds, instrumenting D3 and jQuery takes time');
-  },
   setup: function () {
     var defer = Q.defer();
     benv.setup(function () {
