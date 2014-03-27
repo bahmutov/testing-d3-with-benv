@@ -2,6 +2,8 @@
 
 Testing D3 event functions from command line without an actual browser.
 
+[source file](d3-drawing.js), [unit test file](d3-gt-test.js)
+
 install:
 
     npm install

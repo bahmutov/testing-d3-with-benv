@@ -4,9 +4,6 @@ var benv = require('benv');
 var _ = require('lodash');
 
 QUnit.module('d3-drawing.js', {
-  setupOnce: function () {
-    console.log('please wait a couple of seconds, instrumenting D3 and jQuery takes time');
-  },
   setup: function () {
     var defer = Q.defer();
     benv.setup(function () {
