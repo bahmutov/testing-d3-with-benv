@@ -14,6 +14,7 @@ The repository shows different aspects of testing using different branches:
 * branch d3-testing - [D3 testing](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-testing)
 * branch d3-function-testing - [D3 function testing](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-function-testing)
 * branch d3-mouseover-testing - [D3 events testing](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-mouseover-testing)
+* branch d3-load-test - [D3 code load test](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-load-test)
 
 Each branch has its own code and detailed README
 
@@ -21,7 +22,7 @@ To try these yourself (d3 tests for example):
 
     git clone https://github.com/bahmutov/testing-d3-with-benv.git
     cd testing-d3-with-benv
-    git checkout d3-testing // or dom-testing
+    git checkout d3-testing // or any other test
     npm install
     grunt
     npm test
