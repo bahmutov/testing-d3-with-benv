@@ -34,9 +34,11 @@ Previous parts:
 ## Step 5 - testing custom D3 events
 
 To improve your web application design, I advise to decouple browser events (click, select, etc)
-from business logic events (load data, select item, etc). This significantly simplifies testing reacing
-the great majority of the code while removing need to use synthetic DOM events, like the one I used
-in [Step 4 - D3 event testing](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-mouseover-testing) demo.
+from business logic events (load data, select item, etc). This significantly simplifies testing.
+It is still possible to reach the great majority of the code while removing
+need to use (flaky, unsupported, hard to code) synthetic DOM events,
+like the one I used in
+[Step 4 - D3 event testing](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-mouseover-testing) demo.
 
 This example shows how easy it is to test the decoupled D3 app that uses
 [d3.dispatch](https://github.com/mbostock/d3/wiki/Internals#d3_dispatch) instead of
