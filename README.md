@@ -15,6 +15,7 @@ The repository shows different aspects of testing using different branches:
 * branch d3-function-testing - [D3 function testing](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-function-testing)
 * branch d3-mouseover-testing - [D3 events testing](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-mouseover-testing)
 * branch d3-load-test - [D3 code load test](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-load-test)
+* branch d3-custom-events - [D3 dispatch test](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-custom-events)
 
 Each branch has its own code and detailed README
 
