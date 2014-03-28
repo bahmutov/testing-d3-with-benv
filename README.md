@@ -31,7 +31,7 @@ Previous parts:
 * [Step 4 - D3 event testing](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-mouseover-testing)
 * [Step 5 - D3 load test](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-load-test)
 
-## Step 5 - testing custom D3 events
+## Step 6 - testing custom D3 events
 
 To improve your web application design, I advise to decouple browser events (click, select, etc)
 from business logic events (load data, select item, etc). This significantly simplifies testing.
