@@ -13,6 +13,7 @@ var groups = [
   '45 to 64 Years',
   '65 Years and Over'
 ];
+var data = read('data.csv', 'utf8');
 
 function type(d) {
   d.total = window.d3.sum(groups, function (k) { return d[k] = +d[k]; });
@@ -52,7 +53,7 @@ QUnit.test('dispatch methods', function () {
 
 QUnit.test('CSV file load', function () {
   // cannot use d3.csv directly (no XMLHttpRequest)
-  var states = window.d3.csv.parse(read('data.csv', 'utf8'));
+  var states = window.d3.csv.parse(data);
   QUnit.equal(states.length, 51, 'loaded 50 states + Washington, D.C.');
 });
 
@@ -62,12 +63,12 @@ QUnit.test('CSV file load and sum', function () {
 });
 
 QUnit.test('dispatch load.menu', function () {
-  var states = window.d3.csv.parse(read('data.csv', 'utf8'), type);
+  var states = window.d3.csv.parse(data, type);
   var stateById = window.d3.map();
   states.forEach(function (d) { stateById.set(d.id, d); });
 
   var dispatch = benv.require('./d3-drawing.js', 'dispatch');
-  dispatch.load(stateById);
+  dispatch.load(stateById, groups);
 
   var div = window.d3.select('select');
   console.log(beautify(div.html()));
