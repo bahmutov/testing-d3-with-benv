@@ -2,7 +2,7 @@
 var Q = require('q');
 var benv = require('benv');
 var read = require('fs').readFileSync;
-// var beautify = require('js-beautify').html;
+var beautify = require('js-beautify').html;
 
 var groups = [
   'Under 5 Years',
@@ -18,6 +18,13 @@ var data = read('data.csv', 'utf8');
 function type(d) {
   d.total = window.d3.sum(groups, function (k) { return d[k] = +d[k]; });
   return d;
+}
+
+function loadData() {
+  var states = window.d3.csv.parse(data, type);
+  var stateById = window.d3.map();
+  states.forEach(function (d) { stateById.set(d.id, d); });
+  return stateById;
 }
 
 QUnit.module('dispatching events', {
@@ -74,4 +81,21 @@ QUnit.test('dispatch load.menu', function () {
   var options = select[0][0];
   QUnit.equal(options.length, Object.keys(stateById).length,
     'each state has been added to select drop down');
+});
+
+QUnit.test('pie chart', function () {
+  var stateById = loadData();
+  var dispatch = benv.require('./d3-drawing.js', 'dispatch');
+  dispatch.load(stateById, groups);
+  var pie = window.d3.select('svg#pie');
+  var paths = pie.selectAll('path.age-arc')[0];
+  QUnit.equal(paths.length, groups.length,
+    'a piece of the pie for each age group');
+});
+
+QUnit.test('dispatch statechange', function () {
+  var stateById = loadData();
+  var dispatch = benv.require('./d3-drawing.js', 'dispatch');
+  dispatch.load(stateById, groups);
+  // console.log(beautify(window.d3.select('body').html()));
 });

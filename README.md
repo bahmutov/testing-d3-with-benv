@@ -163,6 +163,49 @@ QUnit.test('dispatch load.menu', function () {
 If we want to be even more concise, we would move data load and initial massaging
 into `QUnit.module setupOnce` function, leaving only the actual call in the unit test.
 
+## Testing pie chart
+
+Let's see how many segments pie chart has. Should be a single
+segment per age group. First, let's add a class to each pie chart *path* node
+to make the selection easier.
+
+```js
+var path = svg.selectAll('path')
+  .data(groups)
+  .enter().append('path')
+    .attr('class', 'age-arc')
+    .style('fill', color)
+    .each(function () { this._current = {startAngle: 0, endAngle: 0}; });
+```
+
+Second, lets add an id to the pie chart
+
+```js
+var svg = d3.select('body').append('svg')
+  .attr('id', 'pie')
+  ...
+```
+
+Each state has people in each age group, so the number of path nodes with
+class `age-arc` should be equal to number of groups.
+
+```js
+QUnit.test('pie chart', function () {
+  var stateById = loadData(); // d3.csv.load, etc,
+  var dispatch = benv.require('./d3-drawing.js', 'dispatch');
+  dispatch.load(stateById, groups);
+  var pie = window.d3.select('svg#pie');
+  var paths = pie.selectAll('path.age-arc')[0];
+  QUnit.equal(paths.length, groups.length,
+    'a piece of the pie for each age group');
+});
+```
+
+## Testing changing state
+
+Let's test changing the selected state. We will use `dispatch` object to select 'MA' state
+and will inspect the selected data in the doughnut chart. Lets see
+
 You can also inspect the generated HTML / SVG markup at any point.
 I suggest using [js-beautify](https://github.com/einars/js-beautify) when
 printing the markup for readibility.

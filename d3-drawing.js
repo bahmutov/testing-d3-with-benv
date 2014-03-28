@@ -86,6 +86,7 @@
         .sort(null);
 
     var svg = d3.select('body').append('svg')
+        .attr('id', 'pie')
         .attr('width', width)
         .attr('height', height)
       .append('g')
@@ -94,6 +95,7 @@
     var path = svg.selectAll('path')
         .data(groups)
       .enter().append('path')
+        .attr('class', 'age-arc')
         .style('fill', color)
         .each(function () { this._current = {startAngle: 0, endAngle: 0}; });
 
