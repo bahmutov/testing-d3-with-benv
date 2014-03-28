@@ -6,7 +6,7 @@
   var dispatch = window.dispatch = d3.dispatch('load', 'statechange');
 
   // A drop-down menu for selecting a state; uses the 'menu' namespace.
-  dispatch.on('load.menu', function(stateById) {
+  dispatch.on('load.menu', function (stateById) {
     var select = d3.select('body')
       .append('div')
       .append('select')

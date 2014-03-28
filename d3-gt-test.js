@@ -2,7 +2,7 @@
 var Q = require('q');
 var benv = require('benv');
 var read = require('fs').readFileSync;
-var beautify = require('js-beautify').html;
+// var beautify = require('js-beautify').html;
 
 var groups = [
   'Under 5 Years',
@@ -70,11 +70,12 @@ QUnit.test('dispatch load.menu', function () {
   var dispatch = benv.require('./d3-drawing.js', 'dispatch');
   dispatch.load(stateById, groups);
 
-  var div = window.d3.select('select');
-  console.log(beautify(div.html()));
+  var select = window.d3.select('select');
+  // console.log(beautify(select.html()));
 
-  var options = window.d3.selectAll('option');
+  var options = select[0][0];
   // console.log(beautify(div.html()));
   // var options = div.selectAll('option');
-  console.log(options.length);
+  QUnit.equal(options.length, Object.keys(stateById).length,
+    'each state has been added to select');
 });

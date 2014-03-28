@@ -33,6 +33,143 @@ Previous parts:
 
 ## Step 5 - testing custom D3 events
 
+To improve your web application design, I advise to decouple browser events (click, select, etc)
+from business logic events (load data, select item, etc). This significantly simplifies testing reacing
+the great majority of the code while removing need to use synthetic DOM events, like the one I used
+in [Step 4 - D3 event testing](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-mouseover-testing) demo.
+
+This example shows how easy it is to test the decoupled D3 app that uses
+[d3.dispatch](https://github.com/mbostock/d3/wiki/Internals#d3_dispatch) instead of
+native browser events, while still covering almost all the source code with unit tests.
+
+## testing data load
+
+The initial application loads data using [d3.csv](https://github.com/mbostock/d3/wiki/CSV#csv)
+call. When running under node, the XMLHttpRequest is unavailable, but we can just load the file from
+the filesystem. We can even load file synchronously, simplifying our testing code.
+After loading, we use the standard [d3.csv.parse](https://github.com/mbostock/d3/wiki/CSV#parse)
+to convert CSV contents into an array of objects.
+
+```js
+// application code
+d3.csv('data.csv', type, function(error, states) { ... });
+// unit test
+var read = require('fs').readFileSync;
+var data = read('data.csv', 'utf8');
+QUnit.test('CSV file load', function () {
+  var states = window.d3.csv.parse(data);
+  QUnit.equal(states.length, 51, 'loaded 50 states + Washington, D.C.');
+});
+```
+
+## coding for testability
+
+Running JavaScript code in the browser has a major disadvantage compared to running under Nodejs.
+In the browser, all code gets jammed into single "virtual" global names space, while Nodejs
+keeps variables and functions from each file separate and inaccessible from other files.
+I agree 100% with the Nodejs approach, because it minimizes accidental variable leaks, overrides and
+other hard to debug problems. But for our purposes, it means that something that wac accessible
+in the browser environment, becomes impossible to test when loading JavaScript files using
+Nodejs `require("path/to/filename.js")` call.
+
+Luckily we can easily reengineer our code to first introduce privacy when running in the
+browser and then to extract things we need to test when running unit tests under Node.
+It is absolutely the best practice to surround all code in your individual JavaScript
+files using a function and only export variables that you want shared by attaching
+them to the window object. For example see [d3-drawing.js](d3-drawing.js)
+
+```js
+// d3-drawing.js
+(function (d3) {
+  if (!d3) {
+    throw new Error('missing d3 library');
+  }
+  var dispatch = window.dispatch = d3.dispatch('load', 'statechange');
+  // use dispatch as usual
+  // nothing from this function can accidentally leak to global namespace
+}(window.d3));
+```
+
+We are exposing `dispatch` object to the outside world. The application logic in [index.html](index.html)
+can then use this object to trigger the `load` event
+
+```
+// index.html
+<script src="d3-drawing.js"></script>
+(function () {
+  // Coerce population counts to numbers and compute total per state.
+  var groups = [
+    "Under 5 Years",
+    ...
+  ];
+  d3.csv('data.csv', type, function(error, states) {
+    ...
+    // use window.dispatch object
+    dispatch.load(stateById, groups);
+    dispatch.statechange(stateById.get("CA"));
+  });
+}());
+```
+
+Notice that we wrapped application code in privacy closure to make sure we are not
+leaking `groups` variable. Instead we are passing `groups` as the second argument
+to `dispatch.load` call.
+
+## getting the dispatch object
+
+Nodejs modules follow [CommonJs](http://spinejs.com/docs/commonjs) convention.
+Everything a module wants public needs to be explicitly listed as a property of
+`exports` object. Since our D3 code runs in the browser, the best we can engineer
+is to attach public variables to the `window` module. How do we get things
+attached to the window inside the loaded files in our unit tests?
+
+By using [benv.require](https://github.com/artsy/benv#benvrequirefilename-globalvarname)
+which uses [rewire](https://github.com/jhnns/rewire) to grab specific variables
+from JavaScript modules that are not CommonJs. If we attached `dispatch` to the
+window, we can load the file and grab it in a unit test like this:
+
+```js
+QUnit.test('dispatch methods', function () {
+  var dispatch = benv.require('./d3-drawing.js', 'dispatch');
+  QUnit.func(dispatch.load, 'dispatch.load is a function');
+  QUnit.func(dispatch.statechange, 'dispatch.statechange is a function');
+});
+```
+
+## Putting it all together
+
+Lets load the CSV file, send an application event to D3 code via
+the `dispatch` object and inspect the synthetic page.
+
+```js
+QUnit.test('dispatch load.menu', function () {
+  var states = window.d3.csv.parse(data, type);
+  var stateById = window.d3.map();
+  states.forEach(function (d) { stateById.set(d.id, d); });
+  var dispatch = benv.require('./d3-drawing.js', 'dispatch');
+  dispatch.load(stateById, groups);
+
+  var select = window.d3.select('select');
+  var options = select[0][0];
+  QUnit.equal(options.length, Object.keys(stateById).length,
+    'each state has been added to select');
+});
+```
+
+If we want to be even more concise, we would move data load and initial massaging
+into `QUnit.module setupOnce` function, leaving only the actual call in the unit test.
+
+You can also inspect the generated HTML / SVG markup at any point.
+I suggest using [js-beautify](https://github.com/einars/js-beautify) when
+printing the markup for readibility.
+
+```js
+var beautify = require('js-beautify').html;
+var select = window.d3.select('select');
+console.log(beautify(select.html()));
+// prints nicely whitespaced HTML to the console
+```
+
 ## Small print
 
 Author: Gleb Bahmutov &copy; 2014
