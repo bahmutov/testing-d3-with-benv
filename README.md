@@ -217,6 +217,81 @@ console.log(beautify(select.html()));
 // prints nicely whitespaced HTML to the console
 ```
 
+Let's inspect the data attached to the first pie segment to make sure
+when selecting Massachusetts, the correct number of kids under 5 years old
+is attached.
+
+```js
+QUnit.test('number of kids in MA under 5', function () {
+  var expectedNumber = 383568; // from data.csv
+  var stateById = loadData();
+  var dispatch = benv.require('./d3-drawing.js', 'dispatch');
+  dispatch.load(stateById, groups);
+  dispatch.statechange(stateById.get('MA'));
+
+  var pie = window.d3.select('svg#pie');
+  var paths = pie.selectAll('path.age-arc')[0];
+  var kidPath = paths[0];
+  var kidData = kidPath.__data__;
+  QUnit.object(kidData, 'expected to find __data__ object');
+  QUnit.equal(kidData.value, expectedNumber,
+    'correct number of children in MA pie chart');
+});
+```
+
+## Testing D3 transitions
+
+Finally, when changing a state, the pie chart transitions each arc to new value.
+To properly test this, we need to let D3 code execute before checking if new
+data has been attached. We can easily do this using `QUnit.async` test
+
+```js
+QUnit.async('transition from MA to NY', function () {
+  var stateById = loadData();
+  var dispatch = benv.require('./d3-drawing.js', 'dispatch');
+  dispatch.load(stateById, groups);
+  dispatch.statechange(stateById.get('MA'));
+  _.defer(function () {
+    dispatch.statechange(stateById.get('NY'));
+    var expectedNumber = 1208495; // from data.csv
+    var pie = window.d3.select('svg#pie');
+    var paths = pie.selectAll('path.age-arc')[0];
+    var kidPath = paths[0];
+    var kidData = kidPath.__data__;
+    QUnit.object(kidData, 'expected to find __data__ object');
+    QUnit.equal(kidData.value, expectedNumber,
+      'correct number of children in NY pie chart');
+    QUnit.start();
+  });
+});
+```js
+
+This is exactly the same unit test as previous one, except we let D3 execute
+before the second state NY is selected. Then we check the number
+of people attached to the first pie segment again.
+
+## Conclusion
+
+Just to show the results, here is the code coverage screenshot saved
+every time you run `npm test` in this example.
+
+![final code coverage](testing-dispatch-coverage.png)
+
+We are covering all but 3 lines
+of code. It would be trivial to test the 2 non-covered lines that deal with
+checking the environment. The final non-covered line is the browser event
+handler for changing the selected state before calling the `dispatch` object.
+
+```js
+.on('change', function () {
+  dispatch.statechange(stateById.get(this.value));
+});
+```
+
+As I promised, we can cover with unit tests almost the entire code except for tiny pieces
+directly dealing with the browser events. All it takes is modular application design
+and engineering for testability.
+
 ## Small print
 
 Author: Gleb Bahmutov &copy; 2014

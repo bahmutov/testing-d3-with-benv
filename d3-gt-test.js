@@ -3,6 +3,7 @@ var Q = require('q');
 var benv = require('benv');
 var read = require('fs').readFileSync;
 var beautify = require('js-beautify').html;
+var _ = require('lodash');
 
 var groups = [
   'Under 5 Years',
@@ -93,9 +94,37 @@ QUnit.test('pie chart', function () {
     'a piece of the pie for each age group');
 });
 
-QUnit.test('dispatch statechange', function () {
+QUnit.test('number of kids in MA under 5', function () {
+  var expectedNumber = 383568; // from data.csv
   var stateById = loadData();
   var dispatch = benv.require('./d3-drawing.js', 'dispatch');
   dispatch.load(stateById, groups);
-  // console.log(beautify(window.d3.select('body').html()));
+  dispatch.statechange(stateById.get('MA'));
+
+  var pie = window.d3.select('svg#pie');
+  var paths = pie.selectAll('path.age-arc')[0];
+  var kidPath = paths[0];
+  var kidData = kidPath.__data__;
+  QUnit.object(kidData, 'expected to find __data__ object');
+  QUnit.equal(kidData.value, expectedNumber,
+    'correct number of children in MA pie chart');
+});
+
+QUnit.async('transition from MA to NY', function () {
+  var stateById = loadData();
+  var dispatch = benv.require('./d3-drawing.js', 'dispatch');
+  dispatch.load(stateById, groups);
+  dispatch.statechange(stateById.get('MA'));
+  _.defer(function () {
+    dispatch.statechange(stateById.get('NY'));
+    var expectedNumber = 1208495; // from data.csv
+    var pie = window.d3.select('svg#pie');
+    var paths = pie.selectAll('path.age-arc')[0];
+    var kidPath = paths[0];
+    var kidData = kidPath.__data__;
+    QUnit.object(kidData, 'expected to find __data__ object');
+    QUnit.equal(kidData.value, expectedNumber,
+      'correct number of children in NY pie chart');
+    QUnit.start();
+  });
 });
