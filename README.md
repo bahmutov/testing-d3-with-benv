@@ -264,7 +264,7 @@ QUnit.async('transition from MA to NY', function () {
     QUnit.start();
   });
 });
-```js
+```
 
 This is exactly the same unit test as previous one, except we let D3 execute
 before the second state NY is selected. Then we check the number
