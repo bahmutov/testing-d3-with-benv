@@ -71,11 +71,7 @@ QUnit.test('dispatch load.menu', function () {
   dispatch.load(stateById, groups);
 
   var select = window.d3.select('select');
-  // console.log(beautify(select.html()));
-
   var options = select[0][0];
-  // console.log(beautify(div.html()));
-  // var options = div.selectAll('option');
   QUnit.equal(options.length, Object.keys(stateById).length,
-    'each state has been added to select');
+    'each state has been added to select drop down');
 });

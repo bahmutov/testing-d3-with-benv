@@ -70,7 +70,7 @@ Running JavaScript code in the browser has a major disadvantage compared to runn
 In the browser, all code gets jammed into single "virtual" global names space, while Nodejs
 keeps variables and functions from each file separate and inaccessible from other files.
 I agree 100% with the Nodejs approach, because it minimizes accidental variable leaks, overrides and
-other hard to debug problems. But for our purposes, it means that something that wac accessible
+other hard to debug problems. But for our purposes, it means that something that was accessible
 in the browser environment, becomes impossible to test when loading JavaScript files using
 Nodejs `require("path/to/filename.js")` call.
 
@@ -98,6 +98,7 @@ can then use this object to trigger the `load` event
 ```
 // index.html
 <script src="d3-drawing.js"></script>
+<script>
 (function () {
   // Coerce population counts to numbers and compute total per state.
   var groups = [
@@ -111,6 +112,7 @@ can then use this object to trigger the `load` event
     dispatch.statechange(stateById.get("CA"));
   });
 }());
+</script>
 ```
 
 Notice that we wrapped application code in privacy closure to make sure we are not
@@ -154,7 +156,7 @@ QUnit.test('dispatch load.menu', function () {
   var select = window.d3.select('select');
   var options = select[0][0];
   QUnit.equal(options.length, Object.keys(stateById).length,
-    'each state has been added to select');
+    'each state has been added to select drop down');
 });
 ```
 

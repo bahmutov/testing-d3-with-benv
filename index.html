@@ -34,7 +34,6 @@
 
   d3.csv('data.csv', type, function(error, states) {
     if (error) throw error;
-    console.log(states);
     var stateById = d3.map();
     states.forEach(function(d) { stateById.set(d.id, d); });
     dispatch.load(stateById, groups);
