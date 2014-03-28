@@ -4,7 +4,20 @@ Testing D3 event functions from command line without an actual browser.
 
 [index.html](index.html), [d3 source file](d3-drawing.js), [unit test file](d3-gt-test.js)
 
-install:
+This is a refactoring for CLI testability of the
+["Dispatching events"](http://bl.ocks.org/mbostock/5872848) example.
+
+This little application loads population data from [data.csv](data.csv)
+and creates 3 entities: drop down selection with US states (plus District of Columbia),
+bar chart to show the total population of a chosen state, plus doughnut chart
+with the number of state's residents per age bracket. It uses a
+[d3.dispatch](https://github.com/mbostock/d3/wiki/Internals#d3_dispatch)
+object to route custom events among the 3 entities. The final look and feel are
+below
+
+![state population dispatch](state-population-dispatch.png)
+
+### install
 
     npm install
     grunt
@@ -19,8 +32,6 @@ Previous parts:
 * [Step 5 - D3 load test](https://github.com/bahmutov/testing-d3-with-benv/tree/d3-load-test)
 
 ## Step 5 - testing custom D3 events
-
-Read [Dispatching events](http://bl.ocks.org/mbostock/5872848) first.
 
 ## Small print
 
