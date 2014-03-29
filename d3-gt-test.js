@@ -2,8 +2,8 @@
 var Q = require('q');
 var benv = require('benv');
 var read = require('fs').readFileSync;
-var beautify = require('js-beautify').html;
 var _ = require('lodash');
+require('console.html');
 
 var groups = [
   'Under 5 Years',
@@ -77,7 +77,6 @@ QUnit.test('dispatch load.menu', function () {
 
   var dispatch = benv.require('./d3-drawing.js', 'dispatch');
   dispatch.load(stateById, groups);
-
   var select = window.d3.select('select');
   var options = select[0][0];
   QUnit.equal(options.length, Object.keys(stateById).length,

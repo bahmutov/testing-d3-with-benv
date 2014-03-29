@@ -217,6 +217,16 @@ console.log(beautify(select.html()));
 // prints nicely whitespaced HTML to the console
 ```
 
+Alternatively, you can use my [console.html](https://github.com/bahmutov/console.html)
+that extends the `console` object with a method that dumps nicely
+formatted HTML string, or if the argument has `.html()` method,
+formats the result
+
+```js
+require('console.html');
+console.html(window.d3.select('select'));
+```
+
 Let's inspect the data attached to the first pie segment to make sure
 when selecting Massachusetts, the correct number of kids under 5 years old
 is attached.
